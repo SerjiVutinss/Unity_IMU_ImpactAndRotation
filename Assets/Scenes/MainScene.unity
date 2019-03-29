@@ -792,7 +792,7 @@ GameObject:
   - component: {fileID: 1913822213}
   - component: {fileID: 1913822214}
   m_Layer: 0
-  m_Name: SubjectGameObject
+  m_Name: Joint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -826,7 +826,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shimmerDevice: {fileID: 235261859}
-  impactThreshold: 1
+  impactThreshold: 10
   offset: {x: 0, y: 0, z: 0}
   txtImpact: {fileID: 1476236151}
 --- !u!1001 &1992399284
