@@ -6,7 +6,7 @@ using UnityEngine.UI;
 using ShimmerRT;
 using System.Collections;
 
-public class ShimmerFeedManager : MonoBehaviour, IFeedable
+public class ShimmerDevice : MonoBehaviour, IFeedable
 {
     #region Fields and Properties
     private string comPort;
@@ -25,7 +25,8 @@ public class ShimmerFeedManager : MonoBehaviour, IFeedable
     }
 
     #region UI Elements
-    public InputField inputComPort;
+    private DeviceDropdown deviceDropdown; // get reference in Start()
+
     public Button btnConnect;
     public Button btnStream;
     public Button btnStop;
@@ -37,6 +38,9 @@ public class ShimmerFeedManager : MonoBehaviour, IFeedable
     #region Unity methods
     void Start()
     {
+        // get a reference to the script on the device dropdown
+        deviceDropdown = gameObject.GetComponentInParent<DeviceDropdown>();
+
         // Add UI Button click handlers
         btnConnect.onClick.AddListener(Connect);
         btnStream.onClick.AddListener(StartStreaming);
@@ -65,9 +69,18 @@ public class ShimmerFeedManager : MonoBehaviour, IFeedable
     // connect to a shimmer, comPort must be set
     public void Connect()
     {
+        var selectedItem = deviceDropdown.SelectedDevice;
+        if (selectedItem == null)
+        {
+            Debug.Log(selectedItem.DisplayName);
+            return;
+        }
+        Debug.Log("NO DEVICE SELECTED!");
+
+
 
         Debug.Log("CONNECT AND STREAM CLICKED");
-        this.comPort = inputComPort.text;
+        this.comPort = selectedItem.ComPort.ToString();
         Debug.Log("USING COM" + this.comPort);
 
         txtOutput.text = "Connecting...";
