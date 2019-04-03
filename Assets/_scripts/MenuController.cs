@@ -1,25 +1,77 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class MenuController : MonoBehaviour
 {
-    public GameObject panel;
-    public Button btnToggleMenu;
+    public GameObject connectPanel;
+    public Button btnToggleConnect;
 
-    private bool isOpen = false;
+    public GameObject recordPanel;
+    public Button btnToggleRecord;
+
+    public GameObject playbackPanel;
+    public Button btnTogglePlayback;
+
+    private List<GameObject> panelList;
 
     public void Awake()
     {
-        panel.gameObject.SetActive(isOpen);
-        btnToggleMenu.onClick.AddListener(TogglePanel);
+        panelList = new List<GameObject>()
+        {
+            connectPanel,
+            recordPanel,
+            playbackPanel
+        };
+
+        // disable all panels
+        connectPanel.gameObject.SetActive(false);
+        recordPanel.gameObject.SetActive(false);
+        playbackPanel.gameObject.SetActive(false);
+
+        btnToggleConnect.onClick.AddListener(ToggleConnectPanel);
+        btnToggleRecord.onClick.AddListener(ToggleRecordPanel);
+        btnTogglePlayback.onClick.AddListener(TogglePlaybackPanel);
     }
 
-    public void TogglePanel()
+    public void TogglePanel(GameObject panel)
     {
-        if (panel != null)
+
+        foreach (var p in panelList)
         {
-            isOpen = !isOpen;
-            panel.SetActive(isOpen);
+            if (p != panel)
+            {
+                p.SetActive(false);
+            }
+        }
+
+        if (panelList.Contains(panel))
+        {
+            panel.SetActive(!panel.activeInHierarchy);
+        }
+    }
+
+    private void ToggleConnectPanel()
+    {
+        if (connectPanel != null)
+        {
+            TogglePanel(connectPanel);
+        }
+    }
+
+    private void ToggleRecordPanel()
+    {
+        if (recordPanel != null)
+        {
+            TogglePanel(recordPanel);
+        }
+    }
+
+    private void TogglePlaybackPanel()
+    {
+        if (playbackPanel != null)
+        {
+            TogglePanel(playbackPanel);
         }
     }
 }
