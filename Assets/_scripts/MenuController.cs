@@ -37,6 +37,9 @@ public class MenuController : MonoBehaviour
     public void TogglePanel(GameObject panel)
     {
 
+        List<string> strings = new List<string>();
+        var s = strings.ToArray();
+
         foreach (var p in panelList)
         {
             if (p != panel)
