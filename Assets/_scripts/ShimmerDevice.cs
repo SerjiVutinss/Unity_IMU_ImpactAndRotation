@@ -17,6 +17,7 @@ public class ShimmerDevice : MonoBehaviour, IFeedable
 
     public Queue<Shimmer3DModel> Queue { get; private set; }
 
+    public bool IsConnecting { get; set; }
     // True if and only if this Shimmer has paired successfully, at which point it will 
     // provide data and a connection with it will be maintained when possible.
     public bool IsPaired
@@ -31,6 +32,11 @@ public class ShimmerDevice : MonoBehaviour, IFeedable
     public Button btnStream;
     public Button btnStop;
     public Text txtOutput;
+    public Text txtIsPaired;
+    public GameObject messagePanel;
+
+    private Image isPairedBackground;
+    private ComDevice selectedItem;
     #endregion
 
     #endregion
@@ -38,6 +44,7 @@ public class ShimmerDevice : MonoBehaviour, IFeedable
     #region Unity methods
     void Start()
     {
+        isPairedBackground = messagePanel.GetComponent<Image>();
         // get a reference to the script on the device dropdown
         deviceDropdown = gameObject.GetComponentInParent<DeviceDropdown>();
 
@@ -47,6 +54,20 @@ public class ShimmerDevice : MonoBehaviour, IFeedable
         btnStop.onClick.AddListener(Disconnect);
 
         Queue = new Queue<Shimmer3DModel>();
+    }
+
+    private void Update()
+    {
+        if (IsConnecting)
+        {
+            if (IsPaired)
+            {
+                btnStream.enabled = IsPaired;
+                txtIsPaired.text = "Paired with " + selectedItem.DisplayName;
+                isPairedBackground.color = Color.green;
+                IsConnecting = false;
+            }
+        }
     }
     #endregion
 
@@ -69,13 +90,12 @@ public class ShimmerDevice : MonoBehaviour, IFeedable
     // connect to a shimmer, comPort must be set
     public void Connect()
     {
-        var selectedItem = deviceDropdown.SelectedDevice;
+        selectedItem = deviceDropdown.SelectedDevice;
         if (selectedItem == null)
         {
-            Debug.Log(selectedItem.DisplayName);
+            Debug.Log("NO DEVICE SELECTED!");
             return;
         }
-        Debug.Log("NO DEVICE SELECTED!");
 
 
 
@@ -87,6 +107,7 @@ public class ShimmerDevice : MonoBehaviour, IFeedable
         sc = new ShimmerController(this);
         txtOutput.text += "\nTrying to connect on COM" + this.comPort;
         sc.Connect("COM" + this.comPort);
+        IsConnecting = true;
     }
 
     // attempt to start streaming
