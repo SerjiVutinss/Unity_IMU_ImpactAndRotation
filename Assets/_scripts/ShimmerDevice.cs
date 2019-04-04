@@ -28,14 +28,23 @@ public class ShimmerDevice : MonoBehaviour, IFeedable
     #region UI Elements
     private DeviceDropdown deviceDropdown; // get reference in Start()
 
+    // buttons with handlers
     public Button btnConnect;
-    public Button btnStream;
-    public Button btnStop;
-    public Text txtOutput;
+    public Button btnDisconnect;
+    public Button btnStartStream;
+    public Button btnStopStream;
+    // UI feedback, output, etc
+    public GameObject pairedPanel;
     public Text txtIsPaired;
-    public GameObject messagePanel;
+    public GameObject streamingPanel;
+    public Text txtIsStreaming;
 
+
+    public Text txtOutput;
+
+    // private fields
     private Image isPairedBackground;
+    private Image isStreamingBackground;
     private ComDevice selectedItem;
     #endregion
 
@@ -44,14 +53,16 @@ public class ShimmerDevice : MonoBehaviour, IFeedable
     #region Unity methods
     void Start()
     {
-        isPairedBackground = messagePanel.GetComponent<Image>();
+        isPairedBackground = pairedPanel.GetComponent<Image>();
+        isStreamingBackground = streamingPanel.GetComponent<Image>();
         // get a reference to the script on the device dropdown
         deviceDropdown = gameObject.GetComponentInParent<DeviceDropdown>();
 
         // Add UI Button click handlers
         btnConnect.onClick.AddListener(Connect);
-        btnStream.onClick.AddListener(StartStreaming);
-        btnStop.onClick.AddListener(Disconnect);
+        btnDisconnect.onClick.AddListener(Disconnect);
+        btnStartStream.onClick.AddListener(StartStream);
+        btnStopStream.onClick.AddListener(StopStream);
 
         Queue = new Queue<Shimmer3DModel>();
     }
@@ -62,7 +73,7 @@ public class ShimmerDevice : MonoBehaviour, IFeedable
         {
             if (IsPaired)
             {
-                btnStream.enabled = IsPaired;
+                btnStartStream.enabled = IsPaired;
                 txtIsPaired.text = "Paired with " + selectedItem.DisplayName;
                 isPairedBackground.color = Color.green;
                 IsConnecting = false;
@@ -97,8 +108,6 @@ public class ShimmerDevice : MonoBehaviour, IFeedable
             return;
         }
 
-
-
         Debug.Log("CONNECT AND STREAM CLICKED");
         this.comPort = selectedItem.ComPort.ToString();
         Debug.Log("USING COM" + this.comPort);
@@ -111,7 +120,7 @@ public class ShimmerDevice : MonoBehaviour, IFeedable
     }
 
     // attempt to start streaming
-    public void StartStreaming()
+    public void StartStream()
     {
         if (!IsPaired)
         {
@@ -125,21 +134,34 @@ public class ShimmerDevice : MonoBehaviour, IFeedable
         txtOutput.text += "\nConnected";
         // set options, start streaming
         sc.ShimmerDevice.Set3DOrientation(true);
+
+
         txtOutput.text += "\nStarting stream...";
+
+
         sc.StartStream();
+        isStreamingBackground.color = Color.green;
+        txtIsStreaming.text = "Streaming";
+
+    }
+
+    private void StopStream()
+    {
+        txtOutput.text += "\nStopping stream";
+        sc.StopStream(); // stop the stream
+        txtOutput.text += "\nStream Stopped";
+
+        isStreamingBackground.color = Color.red;
+        txtIsStreaming.text = "Not Streaming";
     }
 
     // stop the stream and disconnect from paired shimmer
     public void Disconnect()
     {
-        print("Stopping stream...");
-        txtOutput.text += "\nStopping stream";
-        sc.StopStream(); // stop the stream
         sc.ShimmerDevice.Disconnect(); // disconnect from the Shimmer
         sc = null; // set controller to null
-
-        txtOutput.text += "\nStream Stopped";
         txtOutput.text += "\nDisconnected";
+        isPairedBackground.color = Color.red;
     }
 
     #endregion
