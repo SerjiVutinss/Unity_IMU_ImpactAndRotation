@@ -208,7 +208,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &24085887
 RectTransform:
   m_ObjectHideFlags: 0
@@ -594,7 +594,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &161787042
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1933,6 +1933,8 @@ MonoBehaviour:
   btnDisconnect: {fileID: 1999926286}
   btnStartStream: {fileID: 1763809007}
   btnStopStream: {fileID: 1961159535}
+  btnStartRecord: {fileID: 909638972}
+  btnStopRecord: {fileID: 284179069}
   pairedPanel: {fileID: 1490238404}
   txtIsPaired: {fileID: 1961861319}
   streamingPanel: {fileID: 1571898313}

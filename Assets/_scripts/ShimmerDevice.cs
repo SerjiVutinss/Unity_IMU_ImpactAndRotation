@@ -16,6 +16,7 @@ public class ShimmerDevice : MonoBehaviour, IFeedable
     // and ShimmerJointOrientation
 
     public Queue<Shimmer3DModel> Queue { get; private set; }
+    public List<Shimmer3DModel> RecordList { get; set; }
 
     public bool IsConnecting { get; set; }
     // True if and only if this Shimmer has paired successfully, at which point it will 
@@ -25,6 +26,9 @@ public class ShimmerDevice : MonoBehaviour, IFeedable
         get { return sc != null && sc.ShimmerDevice.IsConnected(); }
     }
 
+    public bool IsRecording { get; private set; }
+    public bool IsStreaming { get; private set; }
+
     #region UI Elements
     private DeviceDropdown deviceDropdown; // get reference in Start()
 
@@ -33,6 +37,10 @@ public class ShimmerDevice : MonoBehaviour, IFeedable
     public Button btnDisconnect;
     public Button btnStartStream;
     public Button btnStopStream;
+
+    public Button btnStartRecord;
+    public Button btnStopRecord;
+
     // UI feedback, output, etc
     public GameObject pairedPanel;
     public Text txtIsPaired;
@@ -63,6 +71,8 @@ public class ShimmerDevice : MonoBehaviour, IFeedable
         btnDisconnect.onClick.AddListener(Disconnect);
         btnStartStream.onClick.AddListener(StartStream);
         btnStopStream.onClick.AddListener(StopStream);
+        btnStartRecord.onClick.AddListener(StartRecord);
+        btnStopRecord.onClick.AddListener(StopRecord);
 
         Queue = new Queue<Shimmer3DModel>();
     }
@@ -92,6 +102,11 @@ public class ShimmerDevice : MonoBehaviour, IFeedable
             // put this data as a model on the shared Queue
             s = Shimmer3DModel.GetModelFromArray(data.ToArray());
             Queue.Enqueue(s);
+            if (IsRecording)
+            {
+                // save to list aswell
+                RecordList.Add(s);
+            }
         }
     }
     #endregion
@@ -127,6 +142,10 @@ public class ShimmerDevice : MonoBehaviour, IFeedable
             Debug.Log("NOT PAIRED!");
             return;
         }
+        if (IsStreaming)
+        {
+            Debug.Log("ALREADY STREAMING");
+        }
 
         Debug.Log("PAIRED!");
         sc.ShimmerDevice.WriteBaudRate(230000);
@@ -147,6 +166,11 @@ public class ShimmerDevice : MonoBehaviour, IFeedable
 
     private void StopStream()
     {
+        if (!IsStreaming)
+        {
+            Debug.Log("NOT STREAMING");
+        }
+
         txtOutput.text += "\nStopping stream";
         sc.StopStream(); // stop the stream
         txtOutput.text += "\nStream Stopped";
@@ -162,6 +186,36 @@ public class ShimmerDevice : MonoBehaviour, IFeedable
         sc = null; // set controller to null
         txtOutput.text += "\nDisconnected";
         isPairedBackground.color = Color.red;
+    }
+
+    public void StartRecord()
+    {
+        if (IsStreaming)
+        {
+            if (!IsRecording)
+            {
+                RecordList = new List<Shimmer3DModel>();
+                IsRecording = true;
+                Debug.Log("Started Recording");
+            }
+        }
+        else
+        {
+            Debug.Log("Not streaming - cannot record");
+        }
+    }
+
+    public void StopRecord()
+    {
+        if (IsRecording)
+        {
+            IsRecording = false;
+            Debug.Log("Stopped Recording");
+        }
+        else
+        {
+            Debug.Log("Not recording - cannot stop recording");
+        }
     }
 
     #endregion
