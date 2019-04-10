@@ -5,6 +5,8 @@ using ShimmerRT.models;
 using UnityEngine.UI;
 using ShimmerRT;
 using System.Collections;
+using System;
+using Assets._Scripts;
 
 public class ShimmerDevice : MonoBehaviour, IFeedable
 {
@@ -41,6 +43,8 @@ public class ShimmerDevice : MonoBehaviour, IFeedable
     public Button btnStartRecord;
     public Button btnStopRecord;
 
+    public Button btnSaveToFile;
+
     // UI feedback, output, etc
     public GameObject pairedPanel;
     public Text txtIsPaired;
@@ -73,8 +77,17 @@ public class ShimmerDevice : MonoBehaviour, IFeedable
         btnStopStream.onClick.AddListener(StopStream);
         btnStartRecord.onClick.AddListener(StartRecord);
         btnStopRecord.onClick.AddListener(StopRecord);
+        btnSaveToFile.onClick.AddListener(SaveToFile);
 
         Queue = new Queue<Shimmer3DModel>();
+    }
+
+    private void SaveToFile()
+    {
+        if (RecordList != null && RecordList.Count > 0)
+        {
+            FileHandler.SaveModelToFile("XXXX", RecordList);
+        }
     }
 
     private void Update()
@@ -146,7 +159,7 @@ public class ShimmerDevice : MonoBehaviour, IFeedable
         {
             Debug.Log("ALREADY STREAMING");
         }
-
+        IsStreaming = true;
         Debug.Log("PAIRED!");
         sc.ShimmerDevice.WriteBaudRate(230000);
 
