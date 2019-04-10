@@ -13,7 +13,7 @@ public class ShimmerJointOrientation : MonoBehaviour
 {
     // Myo game object to connect with.
     // This object must have a ThalmicMyo script attached.
-    public GameObject shimmerDevice = null;
+    //public GameObject shimmerDevice = null;
 
     // A rotation that compensates for the Myo armband's orientation parallel to the ground, i.e. yaw.
     // Once set, the direction the Myo armband is facing becomes "forward" within the program.
@@ -27,7 +27,11 @@ public class ShimmerJointOrientation : MonoBehaviour
     // A reference angle representing how the armband is rotated about the wearer's arm, i.e. roll.
     // Set by making the fingers spread pose or pressing "r".
     private float _referenceRoll = 0.0f;
-    private ShimmerFeedManager shimmerFeed;
+
+    private ShimmerDevice shimmerFeed;
+
+    public GameObject SceneManager;
+
     private Vector3 accelerometer;
     private Vector3 gyroscope;
 
@@ -40,8 +44,8 @@ public class ShimmerJointOrientation : MonoBehaviour
     void Start()
     {
         // get the script from the ShimmerDevice object
-        shimmerFeed = shimmerDevice.GetComponent<ShimmerFeedManager>();
-        ResetTransform();
+        shimmerFeed = SceneManager.GetComponent<ShimmerDevice>();
+        //ResetTransform();
     }
 
     private void Update()
@@ -56,7 +60,8 @@ public class ShimmerJointOrientation : MonoBehaviour
                 Debug.Log("Checking Impact");
                 if (CheckImpact(s))
                 {
-                    txtImpact.text = "--IMPACT--" + Time.time;
+                    //txtImpact.text = "--IMPACT--" + Time.time;
+                    Debug.Log("--IMPACT--" + Time.time);
                 }
             }
             UpdateTransform(s);
@@ -93,30 +98,30 @@ public class ShimmerJointOrientation : MonoBehaviour
     }
     #endregion
 
-    void ResetTransform()
-    {
-        // Current zero roll vector and roll value.
-        Vector3 zeroRoll = computeZeroRollVector(shimmerDevice.transform.forward);
-        float roll = rollFromZero(zeroRoll, shimmerDevice.transform.forward, shimmerDevice.transform.up);
+    //void ResetTransform()
+    //{
+    //    // Current zero roll vector and roll value.
+    //    Vector3 zeroRoll = computeZeroRollVector(shimmerDevice.transform.forward);
+    //    float roll = rollFromZero(zeroRoll, shimmerDevice.transform.forward, shimmerDevice.transform.up);
 
-        // The relative roll is simply how much the current roll has changed relative to the reference roll.
-        // adjustAngle simply keeps the resultant value within -180 to 180 degrees.
-        float relativeRoll = normalizeAngle(roll - _referenceRoll);
+    //    // The relative roll is simply how much the current roll has changed relative to the reference roll.
+    //    // adjustAngle simply keeps the resultant value within -180 to 180 degrees.
+    //    float relativeRoll = normalizeAngle(roll - _referenceRoll);
 
-        // antiRoll represents a rotation about the myo Armband's forward axis adjusting for reference roll.
-        Quaternion antiRoll = Quaternion.AngleAxis(relativeRoll, shimmerDevice.transform.forward);
+    //    // antiRoll represents a rotation about the myo Armband's forward axis adjusting for reference roll.
+    //    Quaternion antiRoll = Quaternion.AngleAxis(relativeRoll, shimmerDevice.transform.forward);
 
-        // Here the anti-roll and yaw rotations are applied to the myo Armband's forward direction to yield
-        // the orientation of the joint.
-        transform.rotation = _antiYaw * antiRoll * Quaternion.LookRotation(shimmerDevice.transform.forward);
+    //    // Here the anti-roll and yaw rotations are applied to the myo Armband's forward direction to yield
+    //    // the orientation of the joint.
+    //    transform.rotation = _antiYaw * antiRoll * Quaternion.LookRotation(shimmerDevice.transform.forward);
 
-        // Mirror the rotation around the XZ plane in Unity's coordinate system (XY plane in Myo's coordinate
-        // system). This makes the rotation reflect the arm's orientation, rather than that of the Myo armband.
-        transform.rotation = new Quaternion(transform.localRotation.x,
-                                            -transform.localRotation.y,
-                                            transform.localRotation.z,
-                                            -transform.localRotation.w);
-    }
+    //    // Mirror the rotation around the XZ plane in Unity's coordinate system (XY plane in Myo's coordinate
+    //    // system). This makes the rotation reflect the arm's orientation, rather than that of the Myo armband.
+    //    transform.rotation = new Quaternion(transform.localRotation.x,
+    //                                        -transform.localRotation.y,
+    //                                        transform.localRotation.z,
+    //                                        -transform.localRotation.w);
+    //}
 
     private void UpdateTransform(Shimmer3DModel s)
     {
@@ -173,14 +178,14 @@ public class ShimmerJointOrientation : MonoBehaviour
     // Compute a vector that points perpendicular to the forward direction,
     // minimizing angular distance from world up (positive Y axis).
     // This represents the direction of no rotation about its forward axis.
-    Vector3 computeZeroRollVector(Vector3 forward)
-    {
-        Vector3 antigravity = Vector3.up;
-        Vector3 m = Vector3.Cross(shimmerDevice.transform.forward, antigravity);
-        Vector3 roll = Vector3.Cross(m, shimmerDevice.transform.forward);
+    //Vector3 computeZeroRollVector(Vector3 forward)
+    //{
+    //    Vector3 antigravity = Vector3.up;
+    //    Vector3 m = Vector3.Cross(shimmerDevice.transform.forward, antigravity);
+    //    Vector3 roll = Vector3.Cross(m, shimmerDevice.transform.forward);
 
-        return roll.normalized;
-    }
+    //    return roll.normalized;
+    //}
 
     // Adjust the provided angle to be within a -180 to 180.
     float normalizeAngle(float angle)
