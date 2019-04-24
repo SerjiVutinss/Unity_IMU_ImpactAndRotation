@@ -149,7 +149,7 @@ namespace Assets._Scripts
         }
 
         //build list from file path.. posibly better to load direct from file w/streams?
-        private static List<Shimmer3DModel> LoadModelFromFile(string path)
+        public static List<Shimmer3DModel> LoadModelFromFile(string path)
         {
             /*  
             The File.ReadAllLines reads all lines from the CSV file into a string array.

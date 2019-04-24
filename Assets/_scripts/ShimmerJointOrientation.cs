@@ -57,7 +57,7 @@ public class ShimmerJointOrientation : MonoBehaviour
             // see if there was an 'impact' between this data and the last received data
             if (lastShimmerModel != null)
             {
-                Debug.Log("Checking Impact");
+                //Debug.Log("Checking Impact");
                 if (CheckImpact(s))
                 {
                     //txtImpact.text = "--IMPACT--" + Time.time;
@@ -78,9 +78,9 @@ public class ShimmerJointOrientation : MonoBehaviour
         float dY = Mathf.Abs((float)(lastShimmerModel.Low_Noise_Accelerometer_Y_CAL - s.Low_Noise_Accelerometer_Y_CAL));
         float dZ = Mathf.Abs((float)(lastShimmerModel.Low_Noise_Accelerometer_Z_CAL - s.Low_Noise_Accelerometer_Z_CAL));
 
-        Debug.Log(dX);
-        Debug.Log(dY);
-        Debug.Log(dZ);
+        //Debug.Log(dX);
+        //Debug.Log(dY);
+        //Debug.Log(dZ);
 
         if (dX > impactThreshold)
         {

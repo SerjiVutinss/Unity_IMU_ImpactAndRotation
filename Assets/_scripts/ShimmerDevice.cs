@@ -7,6 +7,7 @@ using ShimmerRT;
 using System.Collections;
 using System;
 using Assets._Scripts;
+using UnityEditor;
 
 public class ShimmerDevice : MonoBehaviour, IFeedable
 {
@@ -88,6 +89,12 @@ public class ShimmerDevice : MonoBehaviour, IFeedable
         {
             FileHandler.SaveModelToFile("XXXX", RecordList);
         }
+    }
+
+    private void LoadFromFile()
+    {
+        string path = EditorUtility.OpenFilePanel("", "", "csv");
+        RecordList = FileHandler.LoadModelFromFile(path);
     }
 
     private void Update()
