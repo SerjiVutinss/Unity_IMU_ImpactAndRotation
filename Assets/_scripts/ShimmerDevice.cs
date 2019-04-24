@@ -31,6 +31,7 @@ public class ShimmerDevice : MonoBehaviour, IFeedable
 
     public bool IsRecording { get; private set; }
     public bool IsStreaming { get; private set; }
+    public bool IsPlayback = false;
 
     #region UI Elements
     private DeviceDropdown deviceDropdown; // get reference in Start()
@@ -45,12 +46,16 @@ public class ShimmerDevice : MonoBehaviour, IFeedable
     public Button btnStopRecord;
 
     public Button btnSaveToFile;
+    public Button btnLoadFile;
+    public Button btnPlaybackSession;
 
     // UI feedback, output, etc
     public GameObject pairedPanel;
     public Text txtIsPaired;
     public GameObject streamingPanel;
     public Text txtIsStreaming;
+    public GameObject recordingPanel;
+    public Text txtIsRecording;
 
 
     public Text txtOutput;
@@ -58,6 +63,7 @@ public class ShimmerDevice : MonoBehaviour, IFeedable
     // private fields
     private Image isPairedBackground;
     private Image isStreamingBackground;
+    private Image isRecordingBackground;
     private ComDevice selectedItem;
     #endregion
 
@@ -68,6 +74,7 @@ public class ShimmerDevice : MonoBehaviour, IFeedable
     {
         isPairedBackground = pairedPanel.GetComponent<Image>();
         isStreamingBackground = streamingPanel.GetComponent<Image>();
+        isRecordingBackground = recordingPanel.GetComponent<Image>();
         // get a reference to the script on the device dropdown
         deviceDropdown = gameObject.GetComponentInParent<DeviceDropdown>();
 
@@ -79,8 +86,16 @@ public class ShimmerDevice : MonoBehaviour, IFeedable
         btnStartRecord.onClick.AddListener(StartRecord);
         btnStopRecord.onClick.AddListener(StopRecord);
         btnSaveToFile.onClick.AddListener(SaveToFile);
+        btnLoadFile.onClick.AddListener(LoadFromFile);
+        btnSaveToFile.onClick.AddListener(PlaybackSession);
 
         Queue = new Queue<Shimmer3DModel>();
+    }
+
+    private void PlaybackSession()
+    {
+        IsPlayback = true;
+        Debug.Log("Playback True");
     }
 
     private void SaveToFile()
@@ -108,6 +123,13 @@ public class ShimmerDevice : MonoBehaviour, IFeedable
                 isPairedBackground.color = Color.green;
                 IsConnecting = false;
             }
+        }
+
+        if (IsRecording)
+        {
+            //btnPlaybackSession.enabled = IsRecording;
+            txtIsRecording.text = "Recording..";
+            isRecordingBackground.color = Color.green;
         }
     }
     #endregion
@@ -230,6 +252,8 @@ public class ShimmerDevice : MonoBehaviour, IFeedable
         if (IsRecording)
         {
             IsRecording = false;
+            txtIsRecording.text = "Not Recording";
+            isRecordingBackground.color = Color.red;
             Debug.Log("Stopped Recording");
         }
         else

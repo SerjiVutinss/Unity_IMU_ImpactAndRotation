@@ -50,22 +50,35 @@ public class ShimmerJointOrientation : MonoBehaviour
 
     private void Update()
     {
-        // if data is available, use it
-        if (shimmerFeed.Queue.Count > 0)
+        if (!shimmerFeed.IsPlayback)
         {
-            var s = shimmerFeed.Queue.Dequeue();
-            // see if there was an 'impact' between this data and the last received data
-            if (lastShimmerModel != null)
+            // if data is available, use it
+            if (shimmerFeed.Queue.Count > 0)
             {
-                //Debug.Log("Checking Impact");
-                if (CheckImpact(s))
+                var s = shimmerFeed.Queue.Dequeue();
+                // see if there was an 'impact' between this data and the last received data
+                if (lastShimmerModel != null)
                 {
-                    //txtImpact.text = "--IMPACT--" + Time.time;
-                    Debug.Log("--IMPACT--" + Time.time);
+                    //Debug.Log("Checking Impact");
+                    if (CheckImpact(s))
+                    {
+                        //txtImpact.text = "--IMPACT--" + Time.time;
+                        Debug.Log("--IMPACT--" + Time.time);
+                    }
                 }
+                UpdateTransform(s);
+                lastShimmerModel = s;
             }
-            UpdateTransform(s);
-            lastShimmerModel = s;
+        }
+        else
+        {
+            if (shimmerFeed.RecordList.Count > 0 && shimmerFeed.RecordList != null && shimmerFeed.IsPlayback == true)
+            {
+                var s = shimmerFeed.RecordList[0];
+                UpdateTransform(s);
+                shimmerFeed.RecordList.Remove(s);
+                shimmerFeed.IsPlayback = false;
+            }
         }
     }
 
