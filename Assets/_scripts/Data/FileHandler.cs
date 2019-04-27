@@ -11,6 +11,7 @@ namespace Assets._Scripts
 {
     public class FileHandler
     {
+        // saves the in-memory data structure to file using the EditorUtility dialog for file selection
         public static void SaveModelToFile(string shimmerID, List<Shimmer3DModel> recordList)
         {
             List<string> fromPlayback = new List<string>();
@@ -47,6 +48,20 @@ namespace Assets._Scripts
             }
         }
 
+        //build list from file path.. posibly better to load direct from file w/streams?
+        public static List<Shimmer3DModel> LoadModelFromFile(string path)
+        {
+            /*  
+            The File.ReadAllLines reads all lines from the CSV file into a string array.
+            The .Select(v => FromCsv(v)) uses Linq to build new shimmer model instead of for each
+             */
+            var loadFile = File.ReadAllLines(path).Select(row => BuildModelFromRow(row))
+                                                .ToList();
+
+            return loadFile;
+        }
+
+        // rebuild a shimmer3D model from a row in a csv file
         public static Shimmer3DModel BuildModelFromRow(string csvLine)
         {
             string[] values = csvLine.Split(',');
@@ -93,6 +108,7 @@ namespace Assets._Scripts
             return loadedModel;
         }
 
+        // create a csv row from a shimmer3D model object
         public static string BuildRowFromModel(Shimmer3DModel s)
         {
             StringBuilder sb = new StringBuilder();
@@ -148,17 +164,5 @@ namespace Assets._Scripts
 
         }
 
-        //build list from file path.. posibly better to load direct from file w/streams?
-        public static List<Shimmer3DModel> LoadModelFromFile(string path)
-        {
-            /*  
-            The File.ReadAllLines reads all lines from the CSV file into a string array.
-            The .Select(v => FromCsv(v)) uses Linq to build new shimmer model instead of for each
-             */
-            var loadFile = File.ReadAllLines(path).Select(row => BuildModelFromRow(row))
-                                                .ToList();
-
-            return loadFile;
-        }
     }
 }
