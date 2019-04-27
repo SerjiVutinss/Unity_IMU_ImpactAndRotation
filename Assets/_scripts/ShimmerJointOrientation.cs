@@ -20,8 +20,6 @@ public class ShimmerJointOrientation : MonoBehaviour
     // Set by making the fingers spread pose or pressing "r".
     private Quaternion _antiYaw = Quaternion.identity;
 
-
-
     public float impactThreshold = 1.0f;
 
     // A reference angle representing how the armband is rotated about the wearer's arm, i.e. roll.
@@ -41,6 +39,11 @@ public class ShimmerJointOrientation : MonoBehaviour
 
     public Text txtImpact;
 
+    // variables used for playback
+    private bool isLive = true;
+    private double firstFrameTime;
+    private double timeSinceLastFrame;
+
     void Start()
     {
         // get the script from the ShimmerDevice object
@@ -50,8 +53,10 @@ public class ShimmerJointOrientation : MonoBehaviour
 
     private void Update()
     {
+        // handle live streaming from shimmer
         if (!shimmerFeed.IsPlayback)
         {
+            isLive = true;
             // if data is available, use it
             if (shimmerFeed.Queue.Count > 0)
             {
@@ -72,12 +77,53 @@ public class ShimmerJointOrientation : MonoBehaviour
         }
         else
         {
+            // handle playback from memory if data is present
+            Shimmer3DModel s;
             if (shimmerFeed.RecordList.Count > 0 && shimmerFeed.RecordList != null && shimmerFeed.IsPlayback == true)
             {
-                var s = shimmerFeed.RecordList[0];
-                UpdateTransform(s);
-                shimmerFeed.RecordList.Remove(s);
-                shimmerFeed.IsPlayback = false;
+
+                // TODO: update this code to account for time between each shimmer model
+
+                // get the first model from the list
+                s = shimmerFeed.RecordList[0];
+
+                // see if this is the first frame of data
+                if (isLive)
+                {
+                    // first frame, set these variables
+                    isLive = false;
+                    // this will be set as the zero frame time
+                    firstFrameTime = s.Timestamp_CAL;
+                    timeSinceLastFrame = 0.0;
+
+                    // update the model's transform accordingly
+                    UpdateTransform(s);
+                    // and remove the 'used' model from the list
+                    shimmerFeed.RecordList.Remove(s);
+                }
+
+                double timeToWait = 0.0;
+                if (!isLive)
+                {
+                    timeToWait = (s.Timestamp_CAL - firstFrameTime) / 1000;
+                }
+
+                if (timeSinceLastFrame >= timeToWait)
+                {
+                    // update the model's transform accordingly
+                    UpdateTransform(s);
+                    // and remove the 'used' model from the list
+                    shimmerFeed.RecordList.Remove(s);
+                }
+                else
+                {
+                    timeSinceLastFrame += Time.deltaTime;
+                }
+
+                // wait the correct amount of time to display the next frame
+
+
+                //shimmerFeed.IsPlayback = false;
             }
         }
     }
