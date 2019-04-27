@@ -87,7 +87,7 @@ public class ShimmerDevice : MonoBehaviour, IFeedable
         btnStopRecord.onClick.AddListener(StopRecord);
         btnSaveToFile.onClick.AddListener(SaveToFile);
         btnLoadFile.onClick.AddListener(LoadFromFile);
-        btnSaveToFile.onClick.AddListener(PlaybackSession);
+        btnPlaybackSession.onClick.AddListener(PlaybackSession);
 
         Queue = new Queue<Shimmer3DModel>();
     }
