@@ -57,7 +57,7 @@ public class ShimmerDevice : MonoBehaviour, IFeedable
     public GameObject recordingPanel;
     public Text txtIsRecording;
 
-
+    public Text inputFilePath;
     public Text txtOutput;
 
     // private fields
@@ -102,7 +102,14 @@ public class ShimmerDevice : MonoBehaviour, IFeedable
     {
         if (RecordList != null && RecordList.Count > 0)
         {
-            FileHandler.SaveModelToFile("XXXX", RecordList);
+            if (inputFilePath.text != null && inputFilePath.text.Length > 0)
+            {
+                FileHandler.SaveModelToFile(inputFilePath.text, RecordList);
+            }
+            else
+            {
+                FileHandler.SaveModelToFile("XXXX", RecordList);
+            }
         }
     }
 
