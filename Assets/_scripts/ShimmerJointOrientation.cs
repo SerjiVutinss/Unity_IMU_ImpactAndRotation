@@ -65,7 +65,7 @@ public class ShimmerJointOrientation : MonoBehaviour
                     //Debug.Log("Checking Impact");
                     if (CheckImpact(s))
                     {
-                        //txtImpact.text = "--IMPACT--" + Time.time;
+                        txtImpact.text = "--IMPACT--" + Time.time;
                         Debug.Log("--IMPACT--" + Time.time);
                     }
                 }
