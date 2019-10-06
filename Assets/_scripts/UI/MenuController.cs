@@ -13,6 +13,9 @@ public class MenuController : MonoBehaviour
     public GameObject playbackPanel;
     public Button btnTogglePlayback;
 
+    public GameObject profilePanel;
+    public Button btnToggleProfile;
+
     private List<GameObject> panelList;
 
     public void Awake()
@@ -21,17 +24,20 @@ public class MenuController : MonoBehaviour
         {
             connectPanel,
             recordPanel,
-            playbackPanel
+            playbackPanel,
+            profilePanel
         };
 
         // disable all panels
         connectPanel.gameObject.SetActive(false);
         recordPanel.gameObject.SetActive(false);
         playbackPanel.gameObject.SetActive(false);
+        profilePanel.gameObject.SetActive(false);
 
         btnToggleConnect.onClick.AddListener(ToggleConnectPanel);
         btnToggleRecord.onClick.AddListener(ToggleRecordPanel);
         btnTogglePlayback.onClick.AddListener(TogglePlaybackPanel);
+        btnToggleProfile.onClick.AddListener(ToggleProfilePanel);
     }
 
     public void TogglePanel(GameObject panel)
@@ -75,6 +81,14 @@ public class MenuController : MonoBehaviour
         if (playbackPanel != null)
         {
             TogglePanel(playbackPanel);
+        }
+    }
+
+        private void ToggleProfilePanel()
+    {
+        if (profilePanel != null)
+        {
+            TogglePanel(profilePanel);
         }
     }
 }
