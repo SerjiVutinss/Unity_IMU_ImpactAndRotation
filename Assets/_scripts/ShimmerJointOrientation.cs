@@ -7,6 +7,9 @@ using UnityEngine.UI;
 // the object to which this script is attached (i.e. the 'Joint' object in the Unity scene)
 public class ShimmerJointOrientation : MonoBehaviour
 {
+    [SerializeField]
+    private float accel_trim = 1.7f;
+
     #region User adjustable variables
     // value used to determine whether an impact has occurred
     // TODO: should be possible for the user to set this in the UI
@@ -132,7 +135,7 @@ public class ShimmerJointOrientation : MonoBehaviour
     private void UpdateTransform(Shimmer3DModel s)
     {
 
-        transform.parent.transform.eulerAngles = offset;
+        transform.eulerAngles = offset;
 
         transform.eulerAngles = new Vector3(
             (float)s.Axis_Angle_X_CAL,
@@ -146,16 +149,29 @@ public class ShimmerJointOrientation : MonoBehaviour
             (float)s.Quaternion_1_CAL,
             -(float)s.Quaternion_3_CAL);
 
+        var z_accel = (float)s.Wide_Range_Accelerometer_Z_CAL + 9.8f;
+        var y_accel = (float)s.Wide_Range_Accelerometer_Y_CAL;
+        var x_accel = (float)s.Wide_Range_Accelerometer_X_CAL;
 
         accelerometer = new Vector3(
-            (float)s.Low_Noise_Accelerometer_Y_CAL,
-            (float)s.Low_Noise_Accelerometer_Z_CAL,
-            -(float)s.Low_Noise_Accelerometer_X_CAL);
+            TrimAccel(y_accel),
+            //(float)s.Wide_Range_Accelerometer_Y_CAL,
+            TrimAccel(z_accel),
+            //(float)s.Wide_Range_Accelerometer_Z_CAL,
+            TrimAccel(x_accel)
+            );
 
         gyroscope = new Vector3(
             (float)s.Gyroscope_Y_CAL,
             (float)s.Gyroscope_Z_CAL,
             -(float)s.Gyroscope_X_CAL);
+
+        transform.position += accelerometer.normalized;
+    }
+
+    public float TrimAccel(float accel)
+    {
+        return Mathf.Abs(accel) > accel_trim ? accel : 0.0f;
     }
 
     #region Impact 
