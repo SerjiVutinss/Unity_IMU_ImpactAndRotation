@@ -11,6 +11,8 @@ using UnityEditor;
 
 public class ShimmerDevice : MonoBehaviour, IFeedable
 {
+    public GameObject ShimmerGameObject;
+
     #region Fields and Properties
     private string comPort;
     private ShimmerController sc;
@@ -94,6 +96,9 @@ public class ShimmerDevice : MonoBehaviour, IFeedable
 
     private void PlaybackSession()
     {
+
+        // reset the transform
+        ShimmerGameObject.transform.position = new Vector3(0, 0, 0);
         IsPlayback = true;
         Debug.Log("Playback True");
     }

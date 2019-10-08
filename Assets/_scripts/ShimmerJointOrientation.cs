@@ -143,11 +143,20 @@ public class ShimmerJointOrientation : MonoBehaviour
             (float)s.Axis_Angle_Z_CAL
             );
 
+
+        //// This seems to work well so keeping for now while experimenting
+        //transform.localRotation = new Quaternion(
+        //    -(float)s.Quaternion_2_CAL,
+        //    -(float)s.Quaternion_0_CAL,
+        //    (float)s.Quaternion_1_CAL,
+        //    -(float)s.Quaternion_3_CAL);
+
         transform.localRotation = new Quaternion(
-            -(float)s.Quaternion_2_CAL,
-            -(float)s.Quaternion_0_CAL,
+            (float)s.Quaternion_0_CAL,
             (float)s.Quaternion_1_CAL,
-            -(float)s.Quaternion_3_CAL);
+            (float)s.Quaternion_2_CAL,
+            (float)s.Quaternion_3_CAL
+            );
 
         var z_accel = (float)s.Wide_Range_Accelerometer_Z_CAL + 9.8f;
         var y_accel = (float)s.Wide_Range_Accelerometer_Y_CAL;
@@ -166,7 +175,7 @@ public class ShimmerJointOrientation : MonoBehaviour
             (float)s.Gyroscope_Z_CAL,
             -(float)s.Gyroscope_X_CAL);
 
-        transform.position += accelerometer.normalized;
+        transform.localPosition += accelerometer.normalized;
     }
 
     public float TrimAccel(float accel)
