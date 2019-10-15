@@ -55,7 +55,7 @@ public class ShimmerJointOrientation : MonoBehaviour
     private void Update()
     {
         // handle live streaming from shimmer
-        if (!shimmerDevice.IsPlayback)
+        if (!shimmerDevice.IsPlayback)  
         {
             isLive = true;
             // if data is available, use it
@@ -144,19 +144,19 @@ public class ShimmerJointOrientation : MonoBehaviour
             );
 
 
-        //// This seems to work well so keeping for now while experimenting
-        //transform.localRotation = new Quaternion(
-        //    -(float)s.Quaternion_2_CAL,
-        //    -(float)s.Quaternion_0_CAL,
-        //    (float)s.Quaternion_1_CAL,
-        //    -(float)s.Quaternion_3_CAL);
-
+        // This seems to work well so keeping for now while experimenting
         transform.localRotation = new Quaternion(
-            (float)s.Quaternion_0_CAL,
+            -(float)s.Quaternion_2_CAL,
+            -(float)s.Quaternion_0_CAL,
             (float)s.Quaternion_1_CAL,
-            (float)s.Quaternion_2_CAL,
-            (float)s.Quaternion_3_CAL
-            );
+            -(float)s.Quaternion_3_CAL);
+
+        //transform.localRotation = new Quaternion(
+        //    (float)s.Quaternion_0_CAL,
+        //    (float)s.Quaternion_1_CAL,
+        //    (float)s.Quaternion_2_CAL,
+        //    (float)s.Quaternion_3_CAL
+        //    );
 
         var z_accel = (float)s.Wide_Range_Accelerometer_Z_CAL + 9.8f;
         var y_accel = (float)s.Wide_Range_Accelerometer_Y_CAL;
