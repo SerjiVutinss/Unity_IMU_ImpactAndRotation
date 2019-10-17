@@ -1,0 +1,32 @@
+[
+    {
+        "Axis": "Low_Noise_Accelerometer_X_CAL",
+        "AvgInput": 2.1561104583,
+        "AvgDelta": 0.0148275047
+    },
+    {
+        "Axis": "Low_Noise_Accelerometer_Y_CAL",
+        "AvgInput": 2.5215041128,
+        "AvgDelta": 0.0111058601
+    },
+    {
+        "Axis": "Low_Noise_Accelerometer_Z_CAL",
+        "AvgInput": 11.2750293772,
+        "AvgDelta": 0.0160089792
+    },
+    {
+        "Axis": "Wide_Range_Accelerometer_X_CAL",
+        "AvgInput": -0.536645802,
+        "AvgDelta": 0.016353134
+    },
+    {
+        "Axis": "Wide_Range_Accelerometer_Y_CAL",
+        "AvgInput": -0.1500574183,
+        "AvgDelta": 0.0168084719
+    },
+    {
+        "Axis": "Wide_Range_Accelerometer_Z_CAL",
+        "AvgInput": 10.4060167888,
+        "AvgDelta": 0.019579528
+    }
+]

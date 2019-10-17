@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using ShimmerRT.models;
 using UnityEngine.UI;
+using System.Linq;
+using Assets._scripts.Data;
 
 // Orient the object to match that of the Shimmer IMU device.
 // 'The Transform' referred to in the comments of this class refers to the transform of 
@@ -9,6 +11,14 @@ public class ShimmerJointOrientation : MonoBehaviour
 {
     [SerializeField]
     private float accel_trim = 1.7f;
+
+    [SerializeField]
+    private float accel_factor = 1.0f;
+
+    [SerializeField]
+    private float adjustFactor = 0.0f;
+
+    private Rigidbody rb;
 
     #region User adjustable variables
     // value used to determine whether an impact has occurred
@@ -22,6 +32,8 @@ public class ShimmerJointOrientation : MonoBehaviour
     #region References to Unity GameObjects and Scripts
     // reference to a shimmer device - live data can be retrieved from this device and applied to the transform
     private ShimmerDevice shimmerDevice;
+    private ReadBaselineData baselineDataScript;
+
     // reference to the SceneManager which controls most of the UI
     public GameObject SceneManager;
     // UI element used to inform user when an impact has occurred
@@ -48,6 +60,8 @@ public class ShimmerJointOrientation : MonoBehaviour
     {
         // get the script from the ShimmerDevice object available through the reference to the SceneManager
         shimmerDevice = SceneManager.GetComponent<ShimmerDevice>();
+        baselineDataScript = GetComponent<ReadBaselineData>();
+        rb = GetComponent<Rigidbody>();
     }
 
     // main logic used to decide what to do with the transform, i.e. live streaming or playback
@@ -55,7 +69,7 @@ public class ShimmerJointOrientation : MonoBehaviour
     private void Update()
     {
         // handle live streaming from shimmer
-        if (!shimmerDevice.IsPlayback)  
+        if (!shimmerDevice.IsPlayback)
         {
             isLive = true;
             // if data is available, use it
@@ -135,13 +149,13 @@ public class ShimmerJointOrientation : MonoBehaviour
     private void UpdateTransform(Shimmer3DModel s)
     {
 
-        transform.eulerAngles = offset;
+        //transform.eulerAngles = offset;
 
-        transform.eulerAngles = new Vector3(
-            (float)s.Axis_Angle_X_CAL,
-            (float)s.Axis_Angle_Y_CAL,
-            (float)s.Axis_Angle_Z_CAL
-            );
+        //transform.eulerAngles = new Vector3(
+        //    (float)s.Axis_Angle_X_CAL,
+        //    (float)s.Axis_Angle_Y_CAL,
+        //    (float)s.Axis_Angle_Z_CAL
+        //    );
 
 
         // This seems to work well so keeping for now while experimenting
@@ -158,24 +172,80 @@ public class ShimmerJointOrientation : MonoBehaviour
         //    (float)s.Quaternion_3_CAL
         //    );
 
-        var z_accel = (float)s.Wide_Range_Accelerometer_Z_CAL + 9.8f;
-        var y_accel = (float)s.Wide_Range_Accelerometer_Y_CAL;
-        var x_accel = (float)s.Wide_Range_Accelerometer_X_CAL;
+        //var z_accel = (float)s.Wide_Range_Accelerometer_Z_CAL + 9.8f;
+        //var y_accel = (float)s.Wide_Range_Accelerometer_Y_CAL;
+        //var x_accel = (float)s.Wide_Range_Accelerometer_X_CAL;
+
+        var y_accel = 0.0f;
+        var z_accel = 0.0f;
+        var x_accel = 0.0f;
+
+        if (this.baselineDataScript != null)
+        {
+            // see if data was loaded correctly, i.e. all 3 axes
+            if (this.baselineDataScript.BaseLineData.Count == 6)
+            {
+                // save the data for ease of reference
+                var baselineData = this.baselineDataScript.BaseLineData;
+
+                var x_base = baselineData.Where(x => x.Axis.Equals("Low_Noise_Accelerometer_X_CAL")).FirstOrDefault();
+                var y_base = baselineData.Where(x => x.Axis.Equals("Low_Noise_Accelerometer_Y_CAL")).FirstOrDefault();
+                var z_base = baselineData.Where(x => x.Axis.Equals("Low_Noise_Accelerometer_Z_CAL")).FirstOrDefault();
+
+                x_accel = GetOutputValue(s.Low_Noise_Accelerometer_X_CAL, x_base);
+                y_accel = GetOutputValue(s.Low_Noise_Accelerometer_Y_CAL, y_base);
+                z_accel = GetOutputValue(s.Low_Noise_Accelerometer_Z_CAL, z_base);
+
+
+                //var x_base = baselineData.Where(x => x.Axis.Equals("Wide_Range_Accelerometer_X_CAL")).FirstOrDefault();
+                //var y_base = baselineData.Where(x => x.Axis.Equals("Wide_Range_Accelerometer_Y_CAL")).FirstOrDefault();
+                //var z_base = baselineData.Where(x => x.Axis.Equals("Wide_Range_Accelerometer_Z_CAL")).FirstOrDefault();
+
+                //x_accel = GetOutputValue(s.Wide_Range_Accelerometer_X_CAL, x_base);
+                //y_accel = GetOutputValue(s.Wide_Range_Accelerometer_Y_CAL, y_base);
+                //z_accel = GetOutputValue(s.Wide_Range_Accelerometer_Z_CAL, z_base);
+
+            }
+        }
+
 
         accelerometer = new Vector3(
-            TrimAccel(y_accel),
+            x_accel,
+            y_accel,
             //(float)s.Wide_Range_Accelerometer_Y_CAL,
-            TrimAccel(z_accel),
+            z_accel
             //(float)s.Wide_Range_Accelerometer_Z_CAL,
-            TrimAccel(x_accel)
             );
+        //Debug.Log(accelerometer.ToString());
 
         gyroscope = new Vector3(
             (float)s.Gyroscope_Y_CAL,
             (float)s.Gyroscope_Z_CAL,
             -(float)s.Gyroscope_X_CAL);
 
-        transform.localPosition += accelerometer.normalized;
+        //transform.localPosition += accelerometer * accel_factor;
+        rb.velocity = accelerometer * accel_factor;
+    }
+
+    private float GetOutputValue(double inputValue, LinearAccelModel model)
+    {
+        // get the difference between the input and the average input
+        var inputDiff = Mathf.Abs(Mathf.Abs((float)inputValue) - Mathf.Abs(model.AvgInput));
+        // is the input difference less than the average delta plus the adjustment?
+        var isLessThanDelta = inputDiff < Mathf.Abs(model.AvgDelta) + adjustFactor;
+
+        // if it is less than the avg delta
+        if (isLessThanDelta)
+        {
+            // just return zero
+            return 0.0f;
+        }
+        else
+        {
+            // not less than avg delta + adjust
+            // return the difference between the input and the avgInput minus the delta
+            return (float)inputValue - model.AvgInput - Mathf.Abs(model.AvgDelta);
+        }
     }
 
     public float TrimAccel(float accel)
